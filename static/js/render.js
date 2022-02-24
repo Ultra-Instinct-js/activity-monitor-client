@@ -349,7 +349,6 @@ function renderHabitList(habitData){
 
         const progBar = document.createElement("div");
         progBar.classList.add("progress-bar");
-        progBar.role = "progressbar";
         progBar.setAttribute("aria-valuenow", data.progressPercentage);
         progBar.setAttribute("aria-valuemin", 0);
         progBar.setAttribute("aria-valuemax", 100);
@@ -442,7 +441,6 @@ function renderHabitInfo(habitData){
 
     const progBar = document.createElement("div");
     progBar.classList.add("progress-bar");
-    progBar.role = "progressbar";
     progBar.setAttribute("aria-valuenow", habitData.progressPercentage);
     progBar.setAttribute("aria-valuemin", 0);
     progBar.setAttribute("aria-valuemax", 100);
@@ -488,7 +486,6 @@ function renderHabitInfo(habitData){
     habitData.consistency.forEach(segment => {
         const consistencyBar = document.createElement("div");
         consistencyBar.classList.add("progress-bar");
-        consistencyBar.role = "progressbar";
         consistencyBar.setAttribute("aria-valuenow", segment.length);
         consistencyBar.setAttribute("aria-valuemin", 0);
         consistencyBar.setAttribute("aria-valuemax", 100);
