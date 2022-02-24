@@ -4,7 +4,7 @@ const { showLoginForm, showRegisterForm, showHabits, showHome, updateNavigation,
 let habitsData = [];
 
 function pageLoadHandler(){
-    navLinkHandler(navLinkEvent("home"));
+    module.exports.navLinkHandler(navLinkEvent("home"));
 }
 
 async function loginSubmitHandler(e){
@@ -20,7 +20,7 @@ async function loginSubmitHandler(e){
         
         const response = await login(formData);
         localStorage.setItem("token", response.token.slice(7));
-        navLinkHandler(navLinkEvent("home"));
+        module.exports.navLinkHandler(navLinkEvent("home"));
         document.querySelector("#login-modal").click();
     } catch (err) {
         // bad login
@@ -53,7 +53,7 @@ async function registerSubmitHandler(e){
 
         const response = await register(formData);
         if(response === "User created"){
-            loginSubmitHandler(e);
+            module.exports.loginSubmitHandler(e);
         } else throw new Error(response);
     } catch (err) {
         // registration error
@@ -126,11 +126,6 @@ function habitClickHandler(e){
     updateBtn.addEventListener("click", habitUpdateHandler);
 }
 
-function newHabitClickHandler(e){
-    const form = showNewHabitForm();
-    form.addEventListener("submit", habitSubmitHandler);
-}
-
 async function habitUpdateHandler(e){
     e.preventDefault();
     const input = e.target.previousElementSibling;
@@ -190,7 +185,6 @@ async function habitDeleteBtnHandler(e){
 
 module.exports = {
     loginSubmitHandler, registerSubmitHandler, formToggleHandler,
-    navLinkHandler, habitClickHandler, newHabitClickHandler,
-    habitUpdateHandler, habitSubmitHandler, habitDeleteBtnHandler,
-    pageLoadHandler
+    navLinkHandler, habitClickHandler, habitUpdateHandler, 
+    habitSubmitHandler, habitDeleteBtnHandler, pageLoadHandler
 };
