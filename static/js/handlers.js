@@ -66,10 +66,10 @@ function formToggleHandler(e){
     const form = document.querySelector(".login-form");
     if(form.id.includes("login")){
         const form = showRegisterForm();
-        form.addEventListener("submit", registerSubmitHandler);
+        form.addEventListener("submit", module.exports.registerSubmitHandler);
     } else {
         const form = showLoginForm();
-        form.addEventListener("submit", loginSubmitHandler);
+        form.addEventListener("submit", module.exports.loginSubmitHandler);
     }
 }
 
@@ -82,22 +82,22 @@ async function navLinkHandler(e){
             localStorage.removeItem("token");
         case "home":
             if(localStorage.getItem("token")){
-                const { uid } = decodeToken();
                 try {
+                    const { uid } = decodeToken();
                     habitsData = await getHabits(uid);
                     showDashboard();
 
                     const habitList = showHabits(habitsData);
                     const rows = habitList.querySelectorAll("tbody > tr");
                     rows.forEach(row => {
-                        row.addEventListener("click", habitClickHandler);
+                        row.addEventListener("click", module.exports.habitClickHandler);
                     });
 
                     const habitForm = showNewHabitForm();
-                    habitForm.addEventListener("submit", habitSubmitHandler);
+                    habitForm.addEventListener("submit", module.exports.habitSubmitHandler);
                 } catch (err) {
                     localStorage.removeItem("token");
-                    navLinkHandler(e);
+                    module.exports.navLinkHandler(e);
                     return;
                 }
             } else {
@@ -106,11 +106,11 @@ async function navLinkHandler(e){
             break;
         case "login":
             form = showLoginForm();
-            form.addEventListener("submit", loginSubmitHandler);
+            form.addEventListener("submit", module.exports.loginSubmitHandler);
             break;
         case "register":
             form = showRegisterForm();
-            form.addEventListener("submit", registerSubmitHandler);
+            form.addEventListener("submit", module.exports.registerSubmitHandler);
             break;
     }
     updateNavigation();

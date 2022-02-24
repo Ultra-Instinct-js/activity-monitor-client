@@ -14,6 +14,7 @@
     helpers.navLinkEvent.mockImplementation(page => ({page}));
     jest.spyOn(handlers, "navLinkHandler").mockImplementation(jest.fn());
     HTMLElement.prototype.click = jest.fn();
+    EventTarget.prototype.addEventListener = jest.fn();
 
     describe("pageLoadHandler", () => {
         it("navigates to home", () => {
@@ -145,6 +146,165 @@
         it("logs user in after account creation", () => {
             handlers.registerSubmitHandler(mockEvent());
             expect(handlers.loginSubmitHandler).toBeCalled();
+        });
+    });
+
+    describe("formToggleHandler", () => {
+        beforeEach(() => {
+            document.documentElement.innerHTML = "<form class='login-form'></form>";
+        });
+
+        beforeAll(() => {
+            helpers.showRegisterForm.mockImplementation(() => {
+                return document.createElement("form");
+            });
+
+            helpers.showLoginForm.mockImplementation(() => {
+                return document.createElement("form");
+            });
+        });
+
+        const mockEvent = {
+            preventDefault: jest.fn()
+        };
+
+        it("shows register form if on login form", () => {
+            document.documentElement.innerHTML = "<form id='login-form' class='login-form'></form>";
+            handlers.formToggleHandler(mockEvent);
+            expect(helpers.showRegisterForm).toBeCalled();
+        });
+        
+        it("attaches event listener to register form", () => {
+            document.documentElement.innerHTML = "<form id='login-form' class='login-form'></form>";
+            handlers.formToggleHandler(mockEvent);
+            const form = document.querySelector("form");
+            expect(form.addEventListener).toBeCalledWith("submit", handlers.registerSubmitHandler);
+        });
+
+        it("shows login form if on register form", () => {
+            document.documentElement.innerHTML = "<form id='register-form' class='login-form'></form>";
+            handlers.formToggleHandler(mockEvent);
+            expect(helpers.showLoginForm).toBeCalled();
+        });
+
+        it("attaches event listener to login form", () => {
+            document.documentElement.innerHTML = "<form id='register-form' class='login-form'></form>";
+            handlers.formToggleHandler(mockEvent);
+            const form = document.querySelector("form");
+            expect(form.addEventListener).toBeCalledWith("submit", handlers.loginSubmitHandler);
+        });
+    });
+
+    describe("navLinkHandler", () => {
+        beforeAll(() => {
+            jest.spyOn(handlers, "navLinkHandler").mockRestore();
+
+            helpers.decodeToken.mockReturnValue({uid: "test_uid"});
+
+            requests.getHabits.mockImplementation(uid => {
+                return new Promise((resolve, reject) => {
+                    if(uid) resolve([]);
+                    else reject("error");
+                });
+            });
+    
+            helpers.showHabits.mockImplementation(() => {
+                const table = document.createElement("table");
+                table.innerHTML = "<tbody><tr></tr></tbody>";
+                document.querySelector("#content").appendChild(table);
+                return table;
+            });
+    
+            helpers.showNewHabitForm.mockImplementation(() => {
+                const form = document.createElement("form");
+                document.querySelector("#content").appendChild(form);
+                return form;
+            });
+    
+            helpers.showLoginForm.mockImplementation(() => {
+                const form = document.createElement("form");
+                document.querySelector("#content").appendChild(form);
+                return form;
+            });
+    
+            helpers.showRegisterForm.mockImplementation(() => {
+                const form = document.createElement("form");
+                document.querySelector("#content").appendChild(form);
+                return form;
+            });
+        });
+
+        beforeEach(() => {
+            document.documentElement.innerHTML = "<main id='content'></main>";
+            jest.clearAllMocks();
+        });
+
+        const mockEvent = page => ({
+            target: {
+                dataset: {page}
+            },
+            preventDefault: jest.fn()
+        });
+
+        it("logout link removes token then goes to home", () => {
+            handlers.navLinkHandler(mockEvent("logout"));
+            expect(localStorage.getItem("token")).toBe(null);
+            expect(helpers.showHome).toBeCalled();
+        });
+
+        it("home link goes to home if localStorage.token empty", () => {
+            localStorage.removeItem("token");
+            handlers.navLinkHandler(mockEvent("home"));
+            expect(helpers.showHome).toBeCalled();
+        });
+
+        it("home link loads dashboard if localStorage.token exists", async () => {
+            localStorage.setItem("token", "token");
+            await handlers.navLinkHandler(mockEvent("home"));
+            const row = document.querySelector("tr");
+            const form = document.querySelector("form");
+            expect(helpers.decodeToken).toBeCalled();
+            expect(requests.getHabits).toBeCalledWith("test_uid");
+            expect(helpers.showDashboard).toBeCalled();
+            expect(row.addEventListener).toBeCalledWith("click", handlers.habitClickHandler);
+            expect(helpers.showNewHabitForm).toBeCalled();
+            expect(form.addEventListener).toBeCalledWith("submit", handlers.habitSubmitHandler);
+        });
+
+        it("login link shows login form", () => {
+            handlers.navLinkHandler(mockEvent("login"));
+            const form = document.querySelector("form");
+            expect(helpers.showLoginForm).toBeCalled();
+            expect(form.addEventListener).toBeCalledWith("submit", handlers.loginSubmitHandler);
+        });
+
+        it("register link shows register form", () => {
+            handlers.navLinkHandler(mockEvent("register"));
+            const form = document.querySelector("form");
+            expect(helpers.showRegisterForm).toBeCalled();
+            expect(form.addEventListener).toBeCalledWith("submit", handlers.registerSubmitHandler);
+        });
+
+        it("nav bar is updated afterwards", async () => {
+            localStorage.setItem("token", "token");
+            await handlers.navLinkHandler(mockEvent("home"));
+            handlers.navLinkHandler(mockEvent("login"));
+            handlers.navLinkHandler(mockEvent("register"));
+            handlers.navLinkHandler(mockEvent("logout"));
+            expect(helpers.updateNavigation).toBeCalledTimes(4);
+        });
+
+        it("user is logged out if API request fails", async () => {
+            requests.getHabits.mockImplementation(uid => {
+                return new Promise((resolve, reject) => {
+                    reject("error");
+                });
+            });
+            localStorage.setItem("token", "token");
+            await handlers.navLinkHandler(mockEvent("home"));
+            expect(localStorage.getItem("token")).toBe(null);
+            expect(helpers.showHome).toBeCalled();
+            expect(helpers.updateNavigation).toBeCalled();
         });
     });
  });
