@@ -16,9 +16,7 @@ describe("render functions", () => {
             expect(content.id).toBe("content");
         });
 
-
-         const heading = content.firstChild.firstChild
-                // = content.children[1]
+        const heading = content.firstChild.firstChild;
 
         it("<h1> element returned for heading", () => {
             expect(heading.tagName).toBe('H1')
