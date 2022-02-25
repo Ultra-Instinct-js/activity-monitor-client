@@ -5,7 +5,7 @@ const { showLoginForm, showRegisterForm, showHabits, showHome, updateNavigation,
 let habitsData = [];
 
 function pageLoadHandler(){
-    navLinkHandler(navLinkEvent("home"));
+    module.exports.navLinkHandler(navLinkEvent("home"));
 }
 
 async function loginSubmitHandler(e){
@@ -21,7 +21,7 @@ async function loginSubmitHandler(e){
         
         const response = await login(formData);
         localStorage.setItem("token", response.token.slice(7));
-        navLinkHandler(navLinkEvent("home"));
+        module.exports.navLinkHandler(navLinkEvent("home"));
         document.querySelector("#login-modal").click();
     } catch (err) {
         // bad login
@@ -54,7 +54,7 @@ async function registerSubmitHandler(e){
 
         const response = await register(formData);
         if(response === "User created"){
-            loginSubmitHandler(e);
+            module.exports.loginSubmitHandler(e);
         } else throw new Error(response);
     } catch (err) {
         // registration error
@@ -67,10 +67,10 @@ function formToggleHandler(e){
     const form = document.querySelector(".login-form");
     if(form.id.includes("login")){
         const form = showRegisterForm();
-        form.addEventListener("submit", registerSubmitHandler);
+        form.addEventListener("submit", module.exports.registerSubmitHandler);
     } else {
         const form = showLoginForm();
-        form.addEventListener("submit", loginSubmitHandler);
+        form.addEventListener("submit", module.exports.loginSubmitHandler);
     }
 }
 
@@ -83,22 +83,22 @@ async function navLinkHandler(e){
             localStorage.removeItem("token");
         case "home":
             if(localStorage.getItem("token")){
-                const { uid } = decodeToken();
                 try {
+                    const { uid } = decodeToken();
                     habitsData = await getHabits(uid);
                     showDashboard();
 
                     const habitList = showHabits(habitsData);
                     const rows = habitList.querySelectorAll("tbody > tr");
                     rows.forEach(row => {
-                        row.addEventListener("click", habitClickHandler);
+                        row.addEventListener("click", module.exports.habitClickHandler);
                     });
 
                     const habitForm = showNewHabitForm();
-                    habitForm.addEventListener("submit", habitSubmitHandler);
+                    habitForm.addEventListener("submit", module.exports.habitSubmitHandler);
                 } catch (err) {
                     localStorage.removeItem("token");
-                    navLinkHandler(e);
+                    module.exports.navLinkHandler(e);
                     return;
                 }
             } else {
@@ -107,11 +107,11 @@ async function navLinkHandler(e){
             break;
         case "login":
             form = showLoginForm();
-            form.addEventListener("submit", loginSubmitHandler);
+            form.addEventListener("submit", module.exports.loginSubmitHandler);
             break;
         case "register":
             form = showRegisterForm();
-            form.addEventListener("submit", registerSubmitHandler);
+            form.addEventListener("submit", module.exports.registerSubmitHandler);
             break;
     }
     updateNavigation();
@@ -125,11 +125,6 @@ function habitClickHandler(e){
     delBtn.addEventListener("click", habitDeleteBtnHandler);
     const updateBtn = habitInfo.querySelector("#update-btn");
     updateBtn.addEventListener("click", habitUpdateHandler);
-}
-
-function newHabitClickHandler(e){
-    const form = showNewHabitForm();
-    form.addEventListener("submit", habitSubmitHandler);
 }
 
 async function habitUpdateHandler(e){
@@ -191,9 +186,8 @@ async function habitDeleteBtnHandler(e){
 
 module.exports = {
     loginSubmitHandler, registerSubmitHandler, formToggleHandler,
-    navLinkHandler, habitClickHandler, newHabitClickHandler,
-    habitUpdateHandler, habitSubmitHandler, habitDeleteBtnHandler,
-    pageLoadHandler
+    navLinkHandler, habitClickHandler, habitUpdateHandler, 
+    habitSubmitHandler, habitDeleteBtnHandler, pageLoadHandler
 };
 
 },{"./helpers":2,"./requests":5}],2:[function(require,module,exports){
@@ -210,11 +204,11 @@ function showDashboard(){
     const newContent = renderDashboard();
     const content = document.querySelector("#content");
     content.replaceWith(newContent);
-    return content;
+    return newContent;
 }
 
 function showHabits(habitData){
-    habitData = habitData.map(habitDataWrapper);
+    habitData = habitData.map(module.exports.habitDataWrapper);
     const newHabitList = renderHabitList(habitData);
     const habitList = document.querySelector("#habit-list");
     habitList.replaceWith(newHabitList);
@@ -222,10 +216,10 @@ function showHabits(habitData){
 }
 
 function showHabitInfo(habitData){
-    habitData = habitDataWrapper(habitData);
+    habitData = module.exports.habitDataWrapper(habitData);
     const newInfo = renderHabitInfo(habitData);
     const cardBody = document.querySelector(".card-body");
-    cardBody.replaceChildren(newInfo);
+    cardBody.replaceWith(newInfo);
     return newInfo;
 }
 
@@ -306,15 +300,17 @@ function toggleUpdateInput(){
 }
 
 function habitDataWrapper(habitData){
-    const progress = calculateProgress(habitData);
+    const progress = module.exports.calculateProgress(habitData);
     return {
         ...habitData,
-        durationAsString: durationToString(habitData.duration),
-        streak: calculateStreak(habitData),
+        durationAsString: module.exports.durationToString(habitData.duration),
+        streak: module.exports.calculateStreak(habitData),
         progress,
         progressPercentage: (progress / habitData.goal) * 100,
-        timeUntilReset: millisecondsToString(calculateReset(habitData)),
-        consistency: consistencyBars(habitData)
+        timeUntilReset: module.exports.millisecondsToString(
+                            module.exports.calculateReset(habitData)
+                        ),
+        consistency: module.exports.consistencyBars(habitData)
     };
 }
 
@@ -329,9 +325,9 @@ function calculateHistoryTotals(habitData){
 }
 
 function calculateStreak(habitData){
-    let history = calculateHistoryTotals(habitData);
-    let streak = 0;
-    for(let i = history.length - 1; i >= 0; i--){
+    let history = module.exports.calculateHistoryTotals(habitData);
+    let streak = history[history.length - 1] >= habitData.goal ? 1 : 0;
+    for(let i = history.length - 2; i >= 0; i--){
         if(history[i] >= habitData.goal){
             streak++;
         } else {
@@ -342,7 +338,7 @@ function calculateStreak(habitData){
 }
 
 function consistencyBars(habitData){
-    let history = calculateHistoryTotals(habitData);
+    let history = module.exports.calculateHistoryTotals(habitData);
     let unitPercentage = 100 / history.length;
     return history.map(entry => ({
         length: unitPercentage,
@@ -351,7 +347,7 @@ function consistencyBars(habitData){
 }
 
 function calculateProgress(habitData){
-    let history = calculateHistoryTotals(habitData);
+    let history = module.exports.calculateHistoryTotals(habitData);
     return history[history.length - 1];
 }
 
@@ -388,7 +384,7 @@ function millisecondsToString(t){
 }
 
 const testingExports = {
-    showForm, isLoggedIn
+    showForm, isLoggedIn, habitDataWrapper, calculateProgress, calculateStreak, calculateReset, millisecondsToString, durationToString, consistencyBars, calculateHistoryTotals
 };
 
 module.exports = {
@@ -411,7 +407,7 @@ function init(){
     pageLoadHandler();
 }
 
-window.API_HOST = "https://activity-monitor-server.herokuapp.com";
+window.API_HOST = "http://localhost:3000";
 init();
 
 },{"./handlers":1}],4:[function(require,module,exports){
@@ -766,7 +762,6 @@ function renderHabitList(habitData){
 
         const progBar = document.createElement("div");
         progBar.classList.add("progress-bar");
-        progBar.role = "progressbar";
         progBar.setAttribute("aria-valuenow", data.progressPercentage);
         progBar.setAttribute("aria-valuemin", 0);
         progBar.setAttribute("aria-valuemax", 100);
@@ -859,7 +854,6 @@ function renderHabitInfo(habitData){
 
     const progBar = document.createElement("div");
     progBar.classList.add("progress-bar");
-    progBar.role = "progressbar";
     progBar.setAttribute("aria-valuenow", habitData.progressPercentage);
     progBar.setAttribute("aria-valuemin", 0);
     progBar.setAttribute("aria-valuemax", 100);
@@ -905,7 +899,6 @@ function renderHabitInfo(habitData){
     habitData.consistency.forEach(segment => {
         const consistencyBar = document.createElement("div");
         consistencyBar.classList.add("progress-bar");
-        consistencyBar.role = "progressbar";
         consistencyBar.setAttribute("aria-valuenow", segment.length);
         consistencyBar.setAttribute("aria-valuemin", 0);
         consistencyBar.setAttribute("aria-valuemax", 100);

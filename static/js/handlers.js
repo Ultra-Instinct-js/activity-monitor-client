@@ -4,7 +4,7 @@ const { showLoginForm, showRegisterForm, showHabits, showHome, updateNavigation,
 let habitsData = [];
 
 function pageLoadHandler(){
-    navLinkHandler(navLinkEvent("home"));
+    module.exports.navLinkHandler(navLinkEvent("home"));
 }
 
 async function loginSubmitHandler(e){
@@ -20,7 +20,7 @@ async function loginSubmitHandler(e){
         
         const response = await login(formData);
         localStorage.setItem("token", response.token.slice(7));
-        navLinkHandler(navLinkEvent("home"));
+        module.exports.navLinkHandler(navLinkEvent("home"));
         document.querySelector("#login-modal").click();
     } catch (err) {
         // bad login
@@ -53,7 +53,7 @@ async function registerSubmitHandler(e){
 
         const response = await register(formData);
         if(response === "User created"){
-            loginSubmitHandler(e);
+            module.exports.loginSubmitHandler(e);
         } else throw new Error(response);
     } catch (err) {
         // registration error
@@ -66,10 +66,10 @@ function formToggleHandler(e){
     const form = document.querySelector(".login-form");
     if(form.id.includes("login")){
         const form = showRegisterForm();
-        form.addEventListener("submit", registerSubmitHandler);
+        form.addEventListener("submit", module.exports.registerSubmitHandler);
     } else {
         const form = showLoginForm();
-        form.addEventListener("submit", loginSubmitHandler);
+        form.addEventListener("submit", module.exports.loginSubmitHandler);
     }
 }
 
@@ -82,22 +82,22 @@ async function navLinkHandler(e){
             localStorage.removeItem("token");
         case "home":
             if(localStorage.getItem("token")){
-                const { uid } = decodeToken();
                 try {
+                    const { uid } = decodeToken();
                     habitsData = await getHabits(uid);
                     showDashboard();
 
                     const habitList = showHabits(habitsData);
                     const rows = habitList.querySelectorAll("tbody > tr");
                     rows.forEach(row => {
-                        row.addEventListener("click", habitClickHandler);
+                        row.addEventListener("click", module.exports.habitClickHandler);
                     });
 
                     const habitForm = showNewHabitForm();
-                    habitForm.addEventListener("submit", habitSubmitHandler);
+                    habitForm.addEventListener("submit", module.exports.habitSubmitHandler);
                 } catch (err) {
                     localStorage.removeItem("token");
-                    navLinkHandler(e);
+                    module.exports.navLinkHandler(e);
                     return;
                 }
             } else {
@@ -106,11 +106,11 @@ async function navLinkHandler(e){
             break;
         case "login":
             form = showLoginForm();
-            form.addEventListener("submit", loginSubmitHandler);
+            form.addEventListener("submit", module.exports.loginSubmitHandler);
             break;
         case "register":
             form = showRegisterForm();
-            form.addEventListener("submit", registerSubmitHandler);
+            form.addEventListener("submit", module.exports.registerSubmitHandler);
             break;
     }
     updateNavigation();
@@ -124,11 +124,6 @@ function habitClickHandler(e){
     delBtn.addEventListener("click", habitDeleteBtnHandler);
     const updateBtn = habitInfo.querySelector("#update-btn");
     updateBtn.addEventListener("click", habitUpdateHandler);
-}
-
-function newHabitClickHandler(e){
-    const form = showNewHabitForm();
-    form.addEventListener("submit", habitSubmitHandler);
 }
 
 async function habitUpdateHandler(e){
@@ -190,7 +185,6 @@ async function habitDeleteBtnHandler(e){
 
 module.exports = {
     loginSubmitHandler, registerSubmitHandler, formToggleHandler,
-    navLinkHandler, habitClickHandler, newHabitClickHandler,
-    habitUpdateHandler, habitSubmitHandler, habitDeleteBtnHandler,
-    pageLoadHandler
+    navLinkHandler, habitClickHandler, habitUpdateHandler, 
+    habitSubmitHandler, habitDeleteBtnHandler, pageLoadHandler
 };
