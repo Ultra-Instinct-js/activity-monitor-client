@@ -119,6 +119,7 @@ describe("Helper functions (updating the DOM)", () => {
     describe("showHabitInfo", () => {
         render.renderHabitInfo.mockImplementation(() => {
             const newInfo = document.createElement("div");
+            newInfo.classList.add("card-body");
             newInfo.id = "info-new";
             return newInfo;
         });
@@ -147,7 +148,7 @@ describe("Helper functions (updating the DOM)", () => {
 
         it("replaces card body children with rendered element", () => {
             helpers.showHabitInfo();
-            const newInfo = document.querySelector("div.card-body > *");
+            const newInfo = document.querySelector("div.card-body");
             const expectedElement = render.renderHabitInfo();
             expect(newInfo).toEqual(expectedElement);
         });

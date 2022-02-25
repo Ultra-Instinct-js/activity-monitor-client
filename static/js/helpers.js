@@ -26,7 +26,7 @@ function showHabitInfo(habitData){
     habitData = module.exports.habitDataWrapper(habitData);
     const newInfo = renderHabitInfo(habitData);
     const cardBody = document.querySelector(".card-body");
-    cardBody.replaceChildren(newInfo);
+    cardBody.replaceWith(newInfo);
     return newInfo;
 }
 
