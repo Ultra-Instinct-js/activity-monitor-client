@@ -12,8 +12,8 @@ function renderHome(){
     content.appendChild(headingContainer);
 
     [
-        ["What is Activity Monitor?", "Activitiy monitor is a webpage that allows anyone to track their personal habits. <br>We hope that Activity Monitor can aid in helping users remain accountable for habits <br>and to promote a positive lifestyle and reach their goals."],
-        ["What am I able to track?", "Anything! Activity Monitor is designed for users to track whatever they wish <br>to track, being to studying a Japanese 1 hour a day, to wanting to lose 20 pounds <br> over 5 months. We have predefined units and timescales so you can spend less time <br> planning and more time completing your goals!."],
+        ["What is Activity Monitor?", "Activity monitor is a webpage that allows anyone to track their personal habits. <br>We hope that Activity Monitor can aid in helping users remain accountable for habits <br>and to promote a positive lifestyle and reach their goals."],
+        ["What am I able to track?", "Anything! Activity Monitor is designed for users to track whatever they wish <br>to track, from studying a Japanese 1 hour a day, to wanting to lose 20 pounds <br> over a year. We have predefined units and timescales so you can spend less time <br> planning and more time completing your goals!."],
         ["Who made Activity Monitor?", "Activity Monitor was designed, created and deployed as a collaborative group project <br> as part of lap 2 of the training course of futureproof. The project occured over the <br> the span of 1 week and was created by team Ultra-Instinct."]
     ].forEach(text => {
         const container = document.createElement("div");
