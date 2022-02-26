@@ -34,21 +34,21 @@ function register({username, email, password, passwordConfirm}){
     });
 }
 
-function deleteUser(uid){
-    return new Promise(async (resolve, reject) => {
-        try {
-            const options = {
-                method: "DELETE",
-                headers: new Headers({'Authorization': `Bearer ${localStorage.getItem('token')}`})
-            }
-            const response = await fetch(`${API_HOST}/users/${uid}`, options);
-            if(response.status !== 204) throw new Error("Could not delete user.");
-            resolve();
-        } catch (err) {
-            reject(err);
-        }
-    });
-}
+// function deleteUser(uid){
+//     return new Promise(async (resolve, reject) => {
+//         try {
+//             const options = {
+//                 method: "DELETE",
+//                 headers: new Headers({'Authorization': `Bearer ${localStorage.getItem('token')}`})
+//             }
+//             const response = await fetch(`${API_HOST}/users/${uid}`, options);
+//             if(response.status !== 204) throw new Error("Could not delete user.");
+//             resolve();
+//         } catch (err) {
+//             reject(err);
+//         }
+//     });
+// }
 
 function getHabits(uid){
     return new Promise(async (resolve, reject) => {
@@ -129,5 +129,5 @@ function deleteHabit(uid, hid){
 }
 
 module.exports = {
-    login, register, deleteUser, getHabits, newHabit, updateHabit, deleteHabit
+    login, register, /*deleteUser, */getHabits, newHabit, updateHabit, deleteHabit
 };

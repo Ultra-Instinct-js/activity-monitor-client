@@ -77,7 +77,7 @@ describe("render functions", () => {
         const container1p = content.children[1].children[1].children[0]
 
         it("container1p has innerHTML contaning long text beginning with Activity monitor is a webpage", () => {
-            expect(container1p.innerHTML).toBe("Activitiy monitor is a webpage that allows anyone to track their personal habits. <br>We hope that Activity Monitor can aid in helping users remain accountable for habits <br>and to promote a positive lifestyle and reach their goals.");
+            expect(container1p.innerHTML).toBe("Activity monitor is a webpage that allows anyone to track their personal habits. <br>We hope that Activity Monitor can aid in helping users remain accountable for habits <br>and to promote a positive lifestyle and reach their goals.");
         });
 
         it("<p> element returned for container1p", () => {
@@ -118,7 +118,7 @@ describe("render functions", () => {
         const container2p = content.children[2].children[1].children[0]
 
         it("container2p has innerHTML contaning long text beginning with Anything! Activity Monitor is designed", () => {
-            expect(container2p.innerHTML).toBe("Anything! Activity Monitor is designed for users to track whatever they wish <br>to track, being to studying a Japanese 1 hour a day, to wanting to lose 20 pounds <br> over 5 months. We have predefined units and timescales so you can spend less time <br> planning and more time completing your goals!.");
+            expect(container2p.innerHTML).toBe("Anything! Activity Monitor is designed for users to track whatever they wish <br>to track, from studying a Japanese 1 hour a day, to wanting to lose 20 pounds <br> over a year. We have predefined units and timescales so you can spend less time <br> planning and more time completing your goals!.");
         });
 
         it("<p> element returned for container2p", () => {
