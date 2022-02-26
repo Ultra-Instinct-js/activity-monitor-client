@@ -72,13 +72,10 @@ The main idea behind the design of the client side was that it should be a singl
 - [x] Incorrect `Content-Type` headers on requests.
 - [x] Completion streak doesn't take into account current day.
 
-## Pitfalls & Discoveries
-
-
-
 ## Remaining Bugs
 
-
+- [ ] Progress bars and animations aren't smooth.
+- [ ] Progress doesn't update dynamically on the habit list after an update.
 
 ## Improvements & Future Features
 
